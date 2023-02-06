@@ -11,8 +11,6 @@ from pdf2image import convert_from_path
 from termcolor import colored, cprint
 from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
 
-'this is new'
-
 from dotenv import load_dotenv
 
 load_dotenv()
