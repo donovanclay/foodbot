@@ -154,6 +154,7 @@ async def on_message(message):
 
         if await wordCountLeaderBoard(message, items, file_data) == True:
             return
+        await getTypoCount(message, items, file_data)
 
     await wordCounter(message, content_lower)
 
@@ -253,7 +254,7 @@ async def help(message):
 # COOKIE
 async def cookie(message, content_lower):
     if content_lower.__contains__("cookie"):
-        for i in range(5):
+        for i in range(3):
             await message.channel.send("EAT COOKIE")
 
 # user can submit ideas for feature
@@ -330,11 +331,11 @@ async def hannah(message):
 
     response = requests.post(endpoint, headers=headers, params=params, data=data)
     json_response = response.json()
-    # print(json_response)
+    print(json_response)
     has_errors = bool(json_response["flaggedTokens"])
 
     print("has errors: " + str(has_errors)) 
-    print(json_response["flaggedTokens"])
+    # print(json_response["flaggedTokens"])
     
     # if has_errors:
     #     for i in json_response["flaggedTokens"]:
@@ -344,10 +345,19 @@ async def hannah(message):
     #     print(json_response["flaggedTokens"][0]["suggestions"][0]["suggestion"])
     if not has_errors:
         return
-    for i in json_response["flaggedTokens"]:
-        if not i["suggestions"][0]["suggestion"].__contains__('\''):
-            print("found \'")
-            await message.add_reaction("<:pepega:1069752783382790175>")
+    
+    with open('users.json','r+') as file:
+        file_data = json.load(file)
+
+        for i in json_response["flaggedTokens"]:
+            if not i["suggestions"][0]["suggestion"].__contains__('\'') and i.get("token") != "staek":
+                
+                file_data["typos"][str(message.author)] += 1
+                await message.add_reaction("<:pepega:1069752783382790175>")
+
+        file.seek(0)
+        json.dump(file_data, file, indent = 4)
+    
     print(json_response["flaggedTokens"][0]["suggestions"][0]["suggestion"])
 
 async def wordCounter(message, content): 
@@ -362,75 +372,91 @@ async def wordCounter(message, content):
 
         # Sets file's current position at offset.
         file.seek(0)
-        # convert back to json.
         json.dump(file_data, file, indent = 4)
 
 async def wordCounterOutput(message, items, file_data):
 
-    if items[0] == "-food" and items[2] == "#":
-        if items[3] not in file_data["words"]:
-            await message.channel.send("I don't count the occurences of *"+ items[3] + "*")
-            return
-        
-        with open('users.json','r') as file:
-        # First we load existing data into a dict.
-            file_data = json.load(file)
-            count = file_data["counter"][file_data["users"].get(items[1])].get(items[3])
+    if items[0] != "-food" or items[2] != "#":
+        return
 
-            await message.channel.send("{0} has said {1} {2} times".format(items[1], items[3], count))
+    if items[3] not in file_data["words"]:
+        await message.channel.send("I don't count the occurences of *"+ items[3] + "*")
+        return
     
-        return True
+    with open('users.json','r') as file:
+    # First we load existing data into a dict.
+        file_data = json.load(file)
+        count = file_data["counter"][file_data["users"].get(items[1])].get(items[3])
+
+        await message.channel.send("{0} has said {1} {2} times".format(items[1], items[3], count))
+
+    return True
 
 async def wordCountLeaderBoard(message, items, file_data):
     # words = ["fuck", "shit", "<:kekw:1035768498313502791>", "<:letsfuckinggo:1035768505485774919>", "<:ughh:1046294416555520000>", "<:hollow:1064666622096326696>", "<:shrunk:1065183547385729044>", "<:diesfrommid:1044704686529327215>"]
     words = file_data["words"]
 
-    if items[0] == "-food" and items[2] == "leaderboard":
-        if items[1] not in words:
-            await message.channel.send("I don't count the occurences of *"+ items[1] + "*")
-            return
+    if items[0] != "-food" or items[2] != "leaderboard":
+        return
 
-        output = "**{} Leaderboard**```".format(items[1].capitalize())
-        # with open('users.json','r') as file:
-        #     file_data = json.load(file)
-        counts = []
-        for user in file_data["users"]:
-            count = file_data["counter"][file_data["users"].get(user)].get(items[1])
-            counts.append((count, user))
-        heapq._heapify_max(counts)
+    if items[1] not in words:
+        await message.channel.send("I don't count the occurences of *"+ items[1] + "*")
+        return
 
-        count = 1
-        for person in counts:
-            if person[0] == 0:
-                break
-            output += "{}. {}: {}\n".format(count, person[1].capitalize(), person[0])
-            count += 1
+    output = "**{} Leaderboard**```".format(items[1].capitalize())
+    # with open('users.json','r') as file:
+    #     file_data = json.load(file)
+    counts = []
+    for user in file_data["users"]:
+        count = file_data["counter"][file_data["users"].get(user)].get(items[1])
+        counts.append((count, user))
+    heapq._heapify_max(counts)
 
-        await message.channel.send(output + "```")
+    count = 1
+    for person in counts:
+        if person[0] == 0:
+            break
+        output += "{}. {}: {}\n".format(count, person[1].capitalize(), person[0])
+        count += 1
 
-        return True
+    await message.channel.send(output + "```")
+
+    return True
 
 async def addToCount(message, items):
-    if items[0] == "-food" and items[1] == "start" and items[2] == "counting":
-        with open('users.json','r+') as file:
-          # First we load existing data into a dict.
-            file_data = json.load(file)
-            if items [3] in file_data["counter"]["donovan#4520"]:
-                await message.channel.send("dawg i already count that jawn")
-                return True
 
-            file_data["words"].append(items[3])
-            for user in file_data["users"]:
-                file_data["counter"][file_data["users"].get(user)].update({items[3]:0})
+    if items[0] != "-food" or items[1] != "start" or items[2] != "counting":
+        return
 
-            # Sets file's current position at offset.
-            file.seek(0)
-            # convert back to json.
-            json.dump(file_data, file, indent = 4)
-            
-            await message.channel.send("okie i count")
-    
-        return True
+    with open('users.json','r+') as file:
+        # First we load existing data into a dict.
+        file_data = json.load(file)
+        if items [3] in file_data["counter"]["donovan#4520"]:
+            await message.channel.send("dawg i already count that jawn")
+            return True
+
+        file_data["words"].append(items[3])
+        for user in file_data["users"]:
+            file_data["counter"][file_data["users"].get(user)].update({items[3]:0})
+
+        # Sets file's current position at offset.
+        file.seek(0)
+        # convert back to json.
+        json.dump(file_data, file, indent = 4)
+        
+        await message.channel.send("okie i count")
+
+    return True
+
+async def getTypoCount(message, items, file_data):
+
+    if items[0] != "-food" or items[2] != "typos":
+        return
+    if items[1] != "luksh" and items[1] != "hannah":
+        await message.channel.send("dawg i dont remember")
+        return
+    count = file_data["typos"].get(file_data["users"].get(items[1]))
+    await message.channel.send("They be making " + str(count) + " typos")
 
 client.run(TOKEN)
 

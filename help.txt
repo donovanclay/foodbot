@@ -3,6 +3,7 @@ Commands:
 -generate [YOUR INPUT SENTENCE]
 -food [USER] # [WORD]
 -food [WORD] leaderboard
+-food [HANNAH/LUKSH] typos
 hi claire!
 foody slap my booty
 woo```
