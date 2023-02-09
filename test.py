@@ -62,7 +62,7 @@ def make_image(input):
     # the object returned is a python generator
     answers = stability_api.generate(
         prompt= input,
-        cfg_scale=8.0,
+        cfg_scale=12.0,
         steps=30  # defaults to 50 if not specified
     )
     # iterating over the generator produces the api response

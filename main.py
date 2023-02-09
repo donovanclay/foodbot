@@ -3,6 +3,7 @@ import os
 import requests
 import time
 import test
+import test3
 import asyncio
 import json
 import sys
@@ -18,7 +19,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 BING_TOKEN = os.getenv('BING_TOKEN')
 
-WORDS = ["fuck", "shit", "<:kekw:1035768498313502791>", "<:letsfuckinggo:1035768505485774919>", "<:ughh:1046294416555520000>", "<:hollow:1064666622096326696>", "<:shrunk:1065183547385729044>", "<:diesfrommid:1044704686529327215>", "<:sadparabola:1035768053859885107>", "<:lasdrogas:1037254091686031422>", "<:die:1036053649782227084>", "<:panik:1069542403582742568>", "<:pepega:1069752783382790175>", "<:theyaskyouifyourefine:1036723056703459328>", "<:thunj:1039084760372351047>"]
+# WORDS = ["fuck", "shit", "<:kekw:1035768498313502791>", "<:letsfuckinggo:1035768505485774919>", "<:ughh:1046294416555520000>", "<:hollow:1064666622096326696>", "<:shrunk:1065183547385729044>", "<:diesfrommid:1044704686529327215>", "<:sadparabola:1035768053859885107>", "<:lasdrogas:1037254091686031422>", "<:die:1036053649782227084>", "<:panik:1069542403582742568>", "<:pepega:1069752783382790175>", "<:theyaskyouifyourefine:1036723056703459328>", "<:thunj:1039084760372351047>"]
 
 intents = robert.Intents.all()
 
@@ -111,9 +112,23 @@ async def on_message(message):
         await message.add_reaction("<:kekw:1035768498313502791>")
         await message.channel.send(file = robert.File('pepega3.jpg'))
 
-    # if items[0] +" "+ items[1] == "foodbot spellcheck":
-    #     if items[2] == "remove":
-    #         spellcheck( )
+    if items[0] == "-food" and items[1] == "chat" and items[2] != "clear":
+        with open("chat.txt", "a") as file:
+            file.write("Human: " + message.content[11:] + "\nAI: ")
+        with open("chat.txt", "r") as file:
+            # print("This is the prompt: " + file.read())
+            # output = test3.generate_response("how do i make an espresso")
+
+            output = test3.generate_response(file.read())
+            print(output)
+        with open("chat.txt", "a") as file:
+            file.write(output + "\n")
+            await message.channel.send(output)
+
+    if items[0] == "-food" and items[1] == "chat" and items[2] == "clear":
+        os.remove("chat.txt")
+        file = open("chat.txt", "x")
+        file.close()
 
 
     if str(message.author) == "koko_#0605":
@@ -159,11 +174,11 @@ async def on_message(message):
     await wordCounter(message, content_lower)
 
 
-# bot tells robert to stop playing his games
+# # bot tells robert to stop playing his games
 # @client.event
 # async def on_presence_update(before, after):
-#     if before.name == "SWu" or after.name == "SWu":
-#         return
+#     # if before.name == "SWu" or after.name == "SWu":
+#     #     return
 #     if after.activity != None and (after.activity).type == robert.ActivityType.playing:
 #         channel = client.get_channel(1033081170080038953)
 #         await channel.send("%s STOP PLAYING GAMES" % after.mention)
@@ -195,6 +210,7 @@ async def homework(message, content_lower, items):
         # print(r.content)
 
         output = r.content.decode('utf-8', errors = "ignore")
+        # print(output)
         if output.__contains__("404 Not Found") or output.__contains__("Forbidden"): 
             print("hw" + items[2] + " doesnt exist")
             await message.channel.send(str(items[1]) + " " + items[3] + items[2] + " isn't released")
@@ -350,7 +366,7 @@ async def hannah(message):
         file_data = json.load(file)
 
         for i in json_response["flaggedTokens"]:
-            if not i["suggestions"][0]["suggestion"].__contains__('\'') and i.get("token") != "staek":
+            if not i["suggestions"][0]["suggestion"].__contains__('\'') and i.get("token") != "staek" and i.get("token") != "-food":
                 
                 file_data["typos"][str(message.author)] += 1
                 await message.add_reaction("<:pepega:1069752783382790175>")
@@ -407,12 +423,16 @@ async def wordCountLeaderBoard(message, items, file_data):
     # with open('users.json','r') as file:
     #     file_data = json.load(file)
     counts = []
+    
     for user in file_data["users"]:
         count = file_data["counter"][file_data["users"].get(user)].get(items[1])
         counts.append((count, user))
-    heapq._heapify_max(counts)
-
+    print("List before: " + str(counts))
+    # heapq._heapify_max(counts)
+    counts.sort(reverse = True)
+    print("List after: + " + str(counts))
     count = 1
+
     for person in counts:
         if person[0] == 0:
             break

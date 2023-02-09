@@ -1,7 +1,8 @@
 Commands:
 ```test [CLASS#] [ASSIGNMENT#] [EX/HW]      Supported Classes: 311, 312, 331, 333, 421, 431
 -generate [YOUR INPUT SENTENCE]
--food [USER] # [WORD]
+```~~-food chat [YOUR PROMPT]~~     RIP
+```-food [USER] # [WORD]
 -food [WORD] leaderboard
 -food [HANNAH/LUKSH] typos
 hi claire!
