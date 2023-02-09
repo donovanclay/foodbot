@@ -19,8 +19,6 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 BING_TOKEN = os.getenv('BING_TOKEN')
 
-# WORDS = ["fuck", "shit", "<:kekw:1035768498313502791>", "<:letsfuckinggo:1035768505485774919>", "<:ughh:1046294416555520000>", "<:hollow:1064666622096326696>", "<:shrunk:1065183547385729044>", "<:diesfrommid:1044704686529327215>", "<:sadparabola:1035768053859885107>", "<:lasdrogas:1037254091686031422>", "<:die:1036053649782227084>", "<:panik:1069542403582742568>", "<:pepega:1069752783382790175>", "<:theyaskyouifyourefine:1036723056703459328>", "<:thunj:1039084760372351047>"]
-
 intents = robert.Intents.all()
 
 client = robert.Client(command_prefix='>', intents=intents)
