@@ -11,12 +11,10 @@ import test
 from pdf2image import convert_from_path
 from termcolor import colored, cprint
 from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
-
 from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-
 BING_TOKEN = os.getenv('BING_TOKEN')
 
 intents = robert.Intents.all()

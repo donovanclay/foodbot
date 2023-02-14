@@ -4,6 +4,8 @@ import warnings
 from PIL import Image
 from stability_sdk import client
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
+from dotenv import load_dotenv
+load_dotenv()
 
 # Our Host URL should not be prepended with "https" nor should it have a trailing slash.
 os.environ['STABILITY_HOST'] = 'grpc.stability.ai:443'
@@ -16,11 +18,12 @@ os.environ['STABILITY_HOST'] = 'grpc.stability.ai:443'
 
 # Paste your API Key below.
 
-os.environ['STABILITY_KEY'] = 'sk-PvRC2INep84w7iMJtajedVpmTqnwDiGOCtyHfM2hOKbZ0lBS'
+os.environ['STABILITY_KEY'] = os.getenv('STABILITY_KEY')
 
 # Set up our connection to the API.
 stability_api = client.StabilityInference(
     key=os.environ['STABILITY_KEY'], # API Key reference.
+    # key=os.getenv("STABILITY_KEY"),
     verbose=True, # Print debug messages.
     engine="stable-diffusion-v1-5", # Set the engine to use for generation. 
     # Available engines: stable-diffusion-v1 stable-diffusion-v1-5 stable-diffusion-512-v2-0 stable-diffusion-768-v2-0 
