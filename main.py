@@ -2,12 +2,12 @@ import discord as robert
 import os
 import requests
 import time
-import test
-import test3
+import imggen
+import foodchat
 import asyncio
 import json
 import sys
-import heapq
+import test
 from pdf2image import convert_from_path
 from termcolor import colored, cprint
 from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
@@ -80,9 +80,9 @@ async def on_message(message):
     if message.content == "foody do the work":
         with open('users.json','r+') as file:
             file_data = json.load(file)
-            for user in file_data["users"]:
+            # for user in file_data["users"]:
             
-                file_data["counter"][file_data["users"].get(user)].pop("penis")
+            file_data["users"].update({"luksh":"intuitively#8976"})
 
                 # Sets file's current position at offset.
             file.seek(0)
@@ -115,9 +115,9 @@ async def on_message(message):
             file.write("Human: " + message.content[11:] + "\nAI: ")
         with open("chat.txt", "r") as file:
             # print("This is the prompt: " + file.read())
-            # output = test3.generate_response("how do i make an espresso")
+            # output = foodchat.generate_response("how do i make an espresso")
 
-            output = test3.generate_response(file.read())
+            output = foodchat.generate_response(file.read())
             print(output)
         with open("chat.txt", "a") as file:
             file.write(output + "\n")
@@ -137,6 +137,8 @@ async def on_message(message):
 
     if str(message.author) == "linguini#8976":
         await hannah(message)
+
+    # await typo2(message, items)
 
     await booty(message)
 
@@ -167,9 +169,31 @@ async def on_message(message):
 
         if await wordCountLeaderBoard(message, items, file_data) == True:
             return
+
         await getTypoCount(message, items, file_data)
 
+        if content_lower == "-food what do you count":
+            await getCountedWords(message, file_data)
+
     await wordCounter(message, content_lower)
+
+    
+
+@client.event
+async def on_raw_reaction_add(payload):
+    print(payload.emoji)
+    print(payload.member)
+    with open('users.json','r+') as file:
+        file_data = json.load(file)
+
+        for word in file_data["words"]:
+            if str(payload.emoji) == word:
+                old_count = file_data["counter"][str(payload.member)].get(word)
+                file_data["counter"][str(payload.member)].update({word:(old_count+1)})
+
+        # Sets file's current position at offset.
+        file.seek(0)
+        json.dump(file_data, file, indent = 4)
 
 
 # # bot tells robert to stop playing his games
@@ -185,7 +209,7 @@ async def on_message(message):
 async def generate(message, items):
     if items[0] == "-generate":
         input = message.content.split("-generate")
-        test.make_image(input[1])
+        imggen.make_image(input[1])
         await message.channel.send(file = robert.File('temp.png'))
         os.remove("temp.png")
         
@@ -229,7 +253,6 @@ async def homework(message, content_lower, items):
                     os.remove("output{}.jpg".format(j))
 
 
-
 # returns the html for cse course homework sites
 def ping(items):
 
@@ -244,6 +267,8 @@ def ping(items):
             return requests.get('https://courses.cs.washington.edu/courses/cse333/23wi/hw/hw{0}/hw{0}.html'.format(items[2]))
     elif items[1] == "312":
         return requests.get('https://courses.cs.washington.edu/courses/cse312/23wi/files/homework/pset{0}.pdf'.format(items[2]))
+    elif items[1] == "599":
+        return requests.get('http://sites.math.washington.edu/~rothvoss/599-winter-2023/problemset{0}.pdf'.format(items[2]))
     # 311, 312, 421
     else: 
         return requests.get('https://courses.cs.washington.edu/courses/cse{0}/23wi/assignments/homework{1}.pdf'.format(str(items[1]), items[2]))
@@ -257,12 +282,12 @@ async def booty(message):
 
 # replies with a somewhat complete list of commands
 async def help(message):
-    with open("help.txt") as file:
+    with open("./help/help.txt") as file:
         await message.channel.send(file.read())
     for i in range(1, 3):
         async with message.channel.typing():
             await asyncio.sleep(2.3)
-        with open("help" + str(i) + ".txt") as file:
+        with open("./help/help" + str(i) + ".txt") as file:
             await message.channel.send(file.read())
 
 # COOKIE
@@ -350,13 +375,7 @@ async def hannah(message):
 
     print("has errors: " + str(has_errors)) 
     # print(json_response["flaggedTokens"])
-    
-    # if has_errors:
-    #     for i in json_response["flaggedTokens"]:
-    #         if not i["suggestions"][0]["suggestion"].__contains__('\''):
-    #             print("found \'")
-    #             await message.add_reaction("<:pepega:1069752783382790175>")
-    #     print(json_response["flaggedTokens"][0]["suggestions"][0]["suggestion"])
+
     if not has_errors:
         return
     
@@ -364,6 +383,7 @@ async def hannah(message):
         file_data = json.load(file)
 
         for i in json_response["flaggedTokens"]:
+            print(i["token"])
             if not i["suggestions"][0]["suggestion"].__contains__('\'') and i.get("token") != "staek" and i.get("token") != "-food":
                 
                 file_data["typos"][str(message.author)] += 1
@@ -425,10 +445,7 @@ async def wordCountLeaderBoard(message, items, file_data):
     for user in file_data["users"]:
         count = file_data["counter"][file_data["users"].get(user)].get(items[1])
         counts.append((count, user))
-    print("List before: " + str(counts))
-    # heapq._heapify_max(counts)
     counts.sort(reverse = True)
-    print("List after: + " + str(counts))
     count = 1
 
     for person in counts:
@@ -475,6 +492,26 @@ async def getTypoCount(message, items, file_data):
         return
     count = file_data["typos"].get(file_data["users"].get(items[1]))
     await message.channel.send("They be making " + str(count) + " typos")
+
+async def typo2(message, items):
+    with open('users.json','r+') as file:
+        file_data = json.load(file)
+        for word in items:
+            if test.isWord(word):
+                continue
+            
+            file_data["typos"][str(message.author)] += 1
+            await message.add_reaction("<:pepega:1069752783382790175>")
+
+        file.seek(0)
+        json.dump(file_data, file, indent = 4)
+
+async def getCountedWords(message, file_data):
+    output = ""
+    for word in file_data["words"][:(len(file_data["words"])-2)]:
+        output += word + ", "
+    output += file_data["words"][len(file_data)-1]
+    await message.channel.send("I count: " + output + " (reactions included)")
 
 client.run(TOKEN)
 

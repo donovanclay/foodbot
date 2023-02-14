@@ -1,0 +1,15 @@
+Commands:
+```test [CLASS#] [ASSIGNMENT#] [EX/HW]      Supported Classes: 311, 312, 331, 333, 421, 431
+-generate [YOUR INPUT SENTENCE]
+```~~-food chat [YOUR PROMPT]~~     RIP
+```-food [USER] # [WORD]
+-food [WORD] leaderboard
+-food start counting [WORD]
+-food [HANNAH/LUKSH] typos
+hi claire!
+foody slap my booty
+woo```
+I will try my best to catch hannahs typos
+
+For feature requests:
+```foodbot request [YOUR SUGGESTION]```
