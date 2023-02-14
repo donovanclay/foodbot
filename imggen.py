@@ -25,7 +25,8 @@ stability_api = client.StabilityInference(
     key=os.environ['STABILITY_KEY'], # API Key reference.
     # key=os.getenv("STABILITY_KEY"),
     verbose=True, # Print debug messages.
-    engine="stable-diffusion-v1-5", # Set the engine to use for generation. 
+    engine="stable-diffusion-768-v2-1",
+    # engine="stable-diffusion-v1-5", # Set the engine to use for generation. 
     # Available engines: stable-diffusion-v1 stable-diffusion-v1-5 stable-diffusion-512-v2-0 stable-diffusion-768-v2-0 
     # stable-diffusion-512-v2-1 stable-diffusion-768-v2-1 stable-inpainting-v1-0 stable-inpainting-512-v2-0
 )
@@ -34,7 +35,7 @@ def make_image(input):
     # the object returned is a python generator
     answers = stability_api.generate(
         prompt= input,
-        cfg_scale=12.0,
+        cfg_scale=5.0, 
         steps=30  # defaults to 50 if not specified
     )
     # iterating over the generator produces the api response
